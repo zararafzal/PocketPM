@@ -208,7 +208,7 @@ export const syncJiraTickets = action({
     projectId: v.id("projects"),
     clerkId: v.optional(v.string()),
   },
-  handler: async (ctx, { projectId, clerkId: _clerkId }) => {
+  handler: async (ctx, { projectId, clerkId: _clerkId }): Promise<{ ticketCount: number; healthScore: number }> => {
     // Get project details
     const project = await ctx.runQuery(api.projects.getById, { projectId });
     if (!project?.jiraProjectKey) throw new Error("Project not found or missing Jira key");
