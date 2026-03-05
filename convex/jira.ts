@@ -252,15 +252,14 @@ export const syncJiraTickets = action({
 
     // ── Compute project-level health score ──────────────────────────────────
     // Re-query tickets after upsert so aiHealthScore values are fresh
-    const scoredTickets = await ctx.runQuery(api.tickets.getByProject, {
-      projectId,
-    });
-    const scores = scoredTickets
+    const scoredTickets: Array<{ aiHealthScore?: number | null; aiHealthLabel?: string | null }> =
+      await ctx.runQuery(api.tickets.getByProject, { projectId });
+    const scores: number[] = scoredTickets
       .map((t) => t.aiHealthScore)
       .filter((s): s is number => s != null);
-    const avgHealth =
+    const avgHealth: number =
       scores.length > 0
-        ? Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length)
+        ? Math.round(scores.reduce((sum: number, s: number) => sum + s, 0) / scores.length)
         : 0;
 
     // Breakdown counts for cache
