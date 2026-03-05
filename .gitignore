@@ -11,9 +11,6 @@ node_modules/
 .next/
 out/
 
-# ── Convex generated files ─────────────────────────────────────
-convex/_generated/
-
 # ── OS / Editor ────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
