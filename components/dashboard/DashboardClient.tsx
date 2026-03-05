@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -75,8 +76,8 @@ export function DashboardClient() {
   const avgHealth =
     projects && projects.length > 0
       ? Math.round(
-          projects.reduce((sum, p) => sum + p.healthScore, 0) / projects.length
-        )
+        projects.reduce((sum, p) => sum + p.healthScore, 0) / projects.length
+      )
       : 0;
 
   const stats = [
@@ -177,7 +178,9 @@ export function DashboardClient() {
               scores ticket health instantly on import.
             </p>
           </div>
-          <ConnectJiraButton connected={false} />
+          <Suspense fallback={null}>
+            <ConnectJiraButton connected={false} />
+          </Suspense>
         </div>
       ) : (
         // ── Connected: project list ────────────────────────────────────────
@@ -201,7 +204,9 @@ export function DashboardClient() {
               {projects?.length !== 1 ? "s" : ""}
             </span>
             <div className="flex items-center gap-2">
-              <ConnectJiraButton connected={true} />
+              <Suspense fallback={null}>
+                <ConnectJiraButton connected={true} />
+              </Suspense>
               <button
                 onClick={handleSyncAll}
                 disabled={syncing}

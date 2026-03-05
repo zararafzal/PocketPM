@@ -13,6 +13,8 @@ interface ProjectPageProps {
   params: { id: string };
 }
 
+export const dynamic = "force-dynamic";
+
 export default function ProjectPage({ params }: ProjectPageProps) {
   const { user } = useUser();
   const clerkId = user?.id ?? "";
