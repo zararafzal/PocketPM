@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap");
+
+/* ─── Design Tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --color-background: #0f1117;
+  --color-surface: #1c1f26;
+  --color-border: #2a2d35;
+  --color-primary: #6e56cf;
+  --color-ai-accent: #9d7fea;
+  --color-success: #3dd68c;
+  --color-warning: #f5a623;
+  --color-danger: #f2453d;
+  --color-text-primary: #f0f0f0;
+  --color-text-muted: #8b8f9a;
+
+  --font-sans: "DM Sans", sans-serif;
+  --font-mono: "DM Mono", monospace;
+
+  --nav-width: 64px;
+  --ai-panel-width: 320px;
+}
+
+/* ─── Base Reset ─────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* ─── Monospace for ticket IDs ───────────────────────────────────────────── */
+.font-mono,
+[class*="ticket-id"],
+[class*="jira-id"] {
+  font-family: var(--font-mono);
+}
+
+/* ─── AI Accent Border Utility ───────────────────────────────────────────── */
+.ai-border-solid {
+  border-left: 3px solid var(--color-ai-accent);
+}
+.ai-border-dashed {
+  border-left: 3px dashed var(--color-ai-accent);
+}
+.ai-border-low {
+  border-left: 3px solid var(--color-border);
+}
+.ai-tint {
+  background-color: rgba(157, 127, 234, 0.06);
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-ai {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 25%,
+    var(--color-border) 50%,
+    var(--color-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.animate-pulse-ai {
+  animation: pulse-ai 2s ease-in-out infinite;
+}
+
+/* ─── Focus Ring ─────────────────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
