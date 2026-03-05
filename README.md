@@ -1,62 +1,105 @@
-# PM Copilot — AI-Native Project Management
+# Pocket PM — AI-Native Project Management Copilot
 
-Built on Next.js 14 · Convex · Clerk · Claude API
+> An AI-powered PM tool that connects to Jira, scores ticket health, analyses sprint risks, and drafts stakeholder updates — built with Next.js, Convex, Clerk, and Claude.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/zararafzal/PocketPM)
 
 ---
 
-## Iteration 1 Setup — Schema, Auth & App Shell
+## Features
+
+- 🔗 **Jira Integration** — OAuth 2.0 connection, full project & ticket import, auto-sync every 15 minutes
+- 🧠 **AI Ticket Health Scoring** — every ticket is scored on description quality, assignee, and estimate
+- ⚡ **Sprint Risk Analysis** — Claude (Haiku + Sonnet) analyses your board and surfaces blocked/at-risk tickets
+- 📝 **Stakeholder Status Updates** — one-click AI-drafted update for your whole sprint
+- ✍️ **Ticket Rewriter** — rewrite any ticket to be clearer, more actionable, and better estimated
+- 🔍 **Semantic Search** — Voyage AI embeddings on every ticket for context-aware AI responses
+- 🔐 **Auth** — Clerk Google OAuth + email sign-in with JWT-authenticated Convex backend
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 14 (App Router) |
+| Backend / DB | Convex (serverless functions + real-time DB) |
+| Auth | Clerk |
+| AI | Anthropic Claude (Haiku + Sonnet 3.5) |
+| Embeddings | Voyage AI |
+| Styling | Tailwind CSS |
+| Deployment | Vercel (frontend) + Convex Cloud (backend) |
+
+---
+
+## Getting Started (Local Development)
 
 ### Prerequisites
+
 - Node.js 18+
-- A [Clerk](https://clerk.com) account (free)
-- A [Convex](https://convex.dev) account (free)
+- [Clerk](https://clerk.com) account (free)
+- [Convex](https://convex.dev) account (free)
+- [Anthropic](https://console.anthropic.com) API key
+- [Atlassian Developer](https://developer.atlassian.com/console/myapps/) OAuth app (for Jira)
 
----
+### 1. Clone and install
 
-### Step 1 — Install dependencies
 ```bash
+git clone https://github.com/zararafzal/PocketPM.git
+cd PocketPM
 npm install
 ```
 
-### Step 2 — Set up Clerk
+### 2. Set up environment variables
 
-1. Go to [https://dashboard.clerk.com](https://dashboard.clerk.com)
-2. Create a new application
-3. Enable **Google OAuth** and **Email** sign-in
-4. Copy your keys from **API Keys** tab
-
-### Step 3 — Set up Convex + Clerk JWT integration
-
-1. Run `npx convex dev` — this creates your Convex deployment and starts the dev server
-2. In [Convex Dashboard](https://dashboard.convex.dev) → your project → **Settings → Authentication**
-3. Add Clerk as an auth provider, paste your **Clerk Frontend API URL**
-4. In **Clerk Dashboard → JWT Templates** → create a new **Convex** template
-5. Copy the **Issuer URL** from the template (your `CLERK_JWT_ISSUER_DOMAIN`)
-
-### Step 4 — Create your .env.local
 ```bash
 cp .env.example .env.local
 ```
 
-Fill in:
-```
+Fill in `.env.local`:
+
+```env
+# Clerk
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+
+# Convex (auto-filled by npx convex dev)
 NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
+
+# Anthropic
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Jira OAuth
+JIRA_CLIENT_ID=your_client_id
+JIRA_CLIENT_SECRET=your_client_secret
+JIRA_REDIRECT_URI=http://localhost:3000/api/jira/callback
+
+# Encryption (for Jira token storage)
+ENCRYPTION_KEY=<64-char hex>  # node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# Clerk JWT (for Convex auth)
 CLERK_JWT_ISSUER_DOMAIN=https://your-app.clerk.accounts.dev
 ```
 
-### Step 5 — Run the development servers
+### 3. Set up Convex environment variables
 
-In two terminals:
-
-**Terminal 1 — Convex backend:**
 ```bash
-npx convex dev
+npx convex env set ANTHROPIC_API_KEY sk-ant-...
+npx convex env set ENCRYPTION_KEY <same 64-char hex>
+npx convex env set CLERK_JWT_ISSUER_DOMAIN https://your-app.clerk.accounts.dev
 ```
 
-**Terminal 2 — Next.js frontend:**
+### 4. Run the development servers
+
 ```bash
+# Terminal 1 — Convex backend
+npx convex dev
+
+# Terminal 2 — Next.js frontend
 npm run dev
 ```
 
@@ -64,85 +107,84 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## Verification Checklist
+## Connecting Jira
 
-1. Navigate to `http://localhost:3000` → redirects to `/dashboard`
-2. Redirected to `/sign-in` (Clerk auth wall active)
-3. Sign in with Google → lands on `/dashboard`
-4. Dashboard renders with three-panel layout:
-   - 64px icon nav on left (Dashboard + Projects icons)
-   - Main content area with stat cards and empty project table
-   - 320px AI panel on right with command hints
-5. Navigate to `/projects/any-id` → project shell renders
-6. Check Convex Dashboard → **Data** → `users` table has your user record
-7. Check Convex Dashboard → **Data** → `workspaces` table has your workspace
-
----
-
-## What's in scope (Iteration 1)
-- ✅ Full Convex schema (all 7 tables — never changed again)
-- ✅ Clerk Google OAuth + email auth
-- ✅ Convex users upsert on first sign-in (creates workspace)
-- ✅ Three-panel layout shell (64px nav / main / 320px AI panel)
-- ✅ Routes: `/` → `/dashboard`, `/dashboard`, `/projects/[id]`
-- ✅ Full design token system (#0F1117 background, #9D7FEA AI accent, DM Sans / DM Mono)
-- ✅ Sign-in / sign-up pages styled to match design system
-
-## What's out of scope (Iteration 1)
-- ❌ Jira integration (Iteration 2)
-- ❌ Real project/ticket data (Iteration 2)
-- ❌ Board health scoring (Iteration 3)
-- ❌ Claude API / AI actions (Iteration 4)
-- ❌ Billing, settings, onboarding flow (post-MVP)
-
----
-
-## Iteration 2 Setup — Jira OAuth, Project Import & Ticket Sync
-
-### New environment variables
-
-**Next.js `.env.local`:**
-```
-JIRA_CLIENT_ID=...          # Atlassian Developer Console → your OAuth app
-JIRA_CLIENT_SECRET=...      # Atlassian Developer Console → your OAuth app
-JIRA_REDIRECT_URI=http://localhost:3000/api/jira/callback
-ENCRYPTION_KEY=<64-char hex>  # node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
-**Convex (must be set separately):**
-```bash
-npx convex env set ENCRYPTION_KEY <same 64-char hex as above>
-```
-
-### Setting up the Jira OAuth app
-
-1. Go to https://developer.atlassian.com/console/myapps/
+1. Go to [developer.atlassian.com/console/myapps](https://developer.atlassian.com/console/myapps/)
 2. Create a new **OAuth 2.0 (3LO)** app
-3. Set **Callback URL** to `http://localhost:3000/api/jira/callback` (local) or your production URL
-4. Add **API scopes**: `read:jira-work`, `read:jira-user`, `offline_access`
-5. Copy **Client ID** and **Secret** to `.env.local`
+3. Set the **Callback URL** to `http://localhost:3000/api/jira/callback` (or your production URL)
+4. Add scopes: `read:jira-work`, `read:jira-user`, `write:jira-work`
+5. Copy **Client ID** and **Secret** into `.env.local`
+6. Sign in to the app → Dashboard → click **Connect Jira**
 
-### How to verify Iteration 2
+---
 
-1. Sign in → Dashboard → click **Connect Jira**
-2. Authorize on Atlassian → redirects back to `/dashboard?connected=1`
-3. Projects appear in the dashboard list with names, keys, ticket counts
-4. Click a project → ticket list renders with status, assignee, priority, story points
-5. Click **Sync Now** → ticket data refreshes
-6. Check Convex Dashboard → **Data** → `projects` and `tickets` tables populated
-7. Check Convex Dashboard → **Crons** → `sync all jira projects` scheduled every 15 minutes
+## Deploying to Vercel
 
-### What's in scope (Iteration 2)
-- ✅ Jira OAuth 2.0 (3LO) — full authorize + callback flow
-- ✅ AES-256-GCM token encryption at rest
-- ✅ Convex action: syncJiraProjects (all projects for workspace)
-- ✅ Convex action: syncJiraTickets (all tickets for a project, paginated)
-- ✅ Convex cron: syncJiraTickets every 15 minutes
-- ✅ Live dashboard with project list (name, key, ticket count, last synced)
-- ✅ Project view with ticket table + filter bar (status, assignee, priority, search)
-- ✅ "Sync Now" button on project view
+### 1. Deploy Convex backend to production
 
-### What's out of scope (Iteration 2)
-- ❌ Health scoring on tickets (Iteration 3)
-- ❌ AI/Claude calls (Iteration 4)
-- ❌ Jira webhooks — cron polling only (post-MVP)
+```bash
+npx convex deploy
+```
+
+Copy the production URL (e.g. `https://capable-snake-828.convex.cloud`).
+
+### 2. Import to Vercel
+
+Go to [vercel.com/new](https://vercel.com/new) → import `zararafzal/PocketPM` from GitHub.
+
+Add all environment variables from `.env.local` plus set:
+- `NEXT_PUBLIC_CONVEX_URL` → your production Convex URL
+- `JIRA_REDIRECT_URI` → `https://your-app.vercel.app/api/jira/callback`
+
+### 3. Update Jira OAuth callback URL
+
+In your Atlassian app, update the **Callback URL** to your Vercel production URL.
+
+---
+
+## Project Structure
+
+```
+├── app/
+│   ├── api/jira/          # Jira OAuth authorize + callback routes
+│   ├── dashboard/         # Main dashboard page + layout
+│   └── projects/[id]/     # Project detail page
+├── components/
+│   ├── dashboard/         # DashboardClient, ConnectJiraButton
+│   ├── layout/            # IconNav, AIPanel, TopBar
+│   ├── projects/          # ProjectPageClient, ticket table, filters, AI panels
+│   └── slash/             # ⌘K slash command bar
+├── convex/
+│   ├── schema.ts          # Database schema (7 tables)
+│   ├── jira.ts            # Jira sync actions
+│   ├── rewriteTicket.ts   # AI ticket rewriter
+│   ├── analyzeSprintRisk.ts # Sprint risk analysis
+│   ├── draftStatusUpdate.ts # AI status update drafter
+│   ├── embeddings.ts      # Voyage AI embedding pipeline
+│   └── crons.ts           # 15-min Jira sync + embedding cron
+└── lib/
+    └── encryption.ts      # AES-256-GCM token encryption
+```
+
+---
+
+## Environment Variables Reference
+
+| Variable | Required | Description |
+|---|---|---|
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | ✅ | Clerk public key |
+| `CLERK_SECRET_KEY` | ✅ | Clerk secret key |
+| `NEXT_PUBLIC_CONVEX_URL` | ✅ | Convex deployment URL |
+| `ANTHROPIC_API_KEY` | ✅ | Claude API key (set in Convex too) |
+| `CLERK_JWT_ISSUER_DOMAIN` | ✅ | Clerk Frontend API URL (set in Convex too) |
+| `ENCRYPTION_KEY` | ✅ | 64-char hex key for Jira token encryption (set in Convex too) |
+| `JIRA_CLIENT_ID` | ✅ | Atlassian OAuth app Client ID |
+| `JIRA_CLIENT_SECRET` | ✅ | Atlassian OAuth app Secret |
+| `JIRA_REDIRECT_URI` | ✅ | OAuth callback URL |
+| `VOYAGE_API_KEY` | Optional | Voyage AI key for ticket embeddings |
+
+---
+
+## License
+
+MIT
